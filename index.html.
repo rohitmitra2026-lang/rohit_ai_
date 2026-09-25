@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rohit AI</title>
+
+<style>
+body{margin:0;background:#0f0f0f;color:white;font-family:Arial,sans-serif}
+.header{padding:18px;text-align:center;font-size:24px;font-weight:bold;border-bottom:1px solid #333}
+#chat{height:70vh;overflow:auto;padding:15px}
+.msg{padding:12px;border-radius:12px;margin:8px 0;max-width:85%;white-space:pre-wrap}
+.user{background:#2563eb;margin-left:auto}
+.ai{background:#2b2b2b}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#111;padding:12px;border-top:1px solid #333}
+textarea{width:100%;height:55px;background:#222;color:white;border:none;border-radius:12px;padding:10px;resize:none}
+button{width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;background:#ff6a00;color:white;font-weight:bold}
+</style>
+
+</head>
+<body>
+
+<div class="header">🤖 Rohit AI</div>
+
+<div id="chat"></div>
+
+<div class="bottom">
+<textarea id="msg" placeholder="বাংলা বা English লিখুন..."></textarea>
+<button onclick="send()">Send</button>
+</div>
+
+<script>
+const API_KEY="sk-or-v1-3fe...4bd
+";
+
+const chat=document.getElementById("chat");
+
+function add(text,type){
+const d=document.createElement("div");
+d.className="msg "+type;
+d.innerText=text;
+chat.appendChild(d);
+chat.scrollTop=chat.scrollHeight;
+}
+
+async function send(){
+
+const input=document.getElementById("msg");
+const msg=input.value.trim();
+
+if(!msg) return;
+
+add(msg,"user");
+input.value="";
+
+try{
+
+const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+
+method:"POST",
+
+headers:{
+Authorization:"Bearer "+API_KEY,
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+model:"mistralai/mistral-7b-instruct:free",
+messages:[
+{
+role:"system",
+content:"তুমি Rohit AI। বাংলা ও English-এ পরিষ্কার উত্তর দাও।"
+},
+{
+role:"user",
+content:msg
+}
+]
+})
+
+});
+
+const data=await res.json();
+
+add(data.choices?.[0]?.message?.content||"No response","ai");
+
+}catch(e){
+
+add("Error: "+e.message,"ai");
+
+}
+
+}
+</script>
+
+</body>
+</html>
